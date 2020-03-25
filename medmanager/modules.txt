@@ -1,0 +1,5 @@
+Medical Manager
+Gestion Administrativa
+Compras
+Gestion Operacional
+Inventario

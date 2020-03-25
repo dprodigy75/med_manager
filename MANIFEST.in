@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include medmanager *.css
+recursive-include medmanager *.csv
+recursive-include medmanager *.html
+recursive-include medmanager *.ico
+recursive-include medmanager *.js
+recursive-include medmanager *.json
+recursive-include medmanager *.md
+recursive-include medmanager *.png
+recursive-include medmanager *.py
+recursive-include medmanager *.svg
+recursive-include medmanager *.txt
+recursive-exclude medmanager *.pyc
