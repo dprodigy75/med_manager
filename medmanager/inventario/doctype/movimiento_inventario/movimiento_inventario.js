@@ -6,13 +6,15 @@ frappe.ui.form.on('Movimiento Inventario', {
 		cur_frm.set_query("producto", "movimientos", function(doc, cdt, cdn) {
 			var d = locals[cdt][cdn];
 
-			var data = { almacen: doc.almacen_origen };
+			var data = { "almacen": doc.almacen_origen };
 
 			if(!(doc.almacen_origen == null))
 			{
 				return {
 					query: "medmanager.inventario.doctype.movimiento_inventario.movimiento_inventario.productos_almacen",
-					args: JSON.stringify(data)
+					filters: {
+						almacen: doc.almacen_origen
+					}
 				}
 			}
 		});

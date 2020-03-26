@@ -18,7 +18,8 @@ class MovimientoInventario(Document):
 @frappe.whitelist()
 def productos_almacen(doctype, txt, searchfield, start, page_len, filters):
 	# Validate properties before merging
-	if filters.get('almacen'):
+	almacen = filters.get('almacen')
+	if almacen:
 		if not frappe.db.exists("Almacen", almacen):
 			throw("El Almacén: {0} no existe".format(almacen))
 	else:
