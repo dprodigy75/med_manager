@@ -8,11 +8,16 @@ from frappe import _
 
 from frappe.model.document import Document
 
+""" frappe.datetime.add_days(date, days);   // add n days to a date
+frappe.datetime.add_months(date, months); // add n months to a date
+frappe.datetime.month_end(date);  // returns the first day from the month of the given date
+frappe.datetime.month_start(date); // returns the last day from the month of the given date
+frappe.datetime.get_day_diff(begin, end); // returns the days between 2 dates """
 
 class Contrato(Document):
 
 	def validate(self):
-		self.validate_dates()
+		self.validate_fechas()
 		# self.validate_item()
 
 	def before_save(self):
@@ -23,9 +28,12 @@ class Contrato(Document):
 	# 	if not frappe.db.exists("Item", self.item_code):
 	# 		frappe.throw(_("Item {0} not found").format(self.item_code))
 
-	def validate_dates(self):
+	def validate_vigencia(self):
+		return frappe.datetime.now() > self.fecha_final
+
+	def validate_fechas(self):
 		if self.fecha_inicial and self.fecha_final:
 			if self.fecha_inicial > self.fecha_final:
-				frappe.throw("La fecha de inicio debe ser menor a la fecha del final del contrato. Test")
+				frappe.throw("La fecha de inicio debe ser menor a la fecha del final del contrato")
 
 
