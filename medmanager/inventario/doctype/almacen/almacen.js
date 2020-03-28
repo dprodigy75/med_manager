@@ -4,5 +4,8 @@
 frappe.ui.form.on('Almacen', {
 	refresh: function(frm) {
 
-	}
+	},
+	onload: function(frm) {
+		cur_frm.clear_table("inventario");
+	},
 });

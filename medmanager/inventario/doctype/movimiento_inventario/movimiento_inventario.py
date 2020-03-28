@@ -21,12 +21,13 @@ def productos_almacen(doctype, txt, searchfield, start, page_len, filters):
 	almacen = filters.get('almacen')
 	if almacen:
 		if not frappe.db.exists("Almacen", almacen):
-			throw("El Almacén: {0} no existe".format(almacen))
+			throw("El Almacén: {0} no existe".format(almacen))			
 	else:
 		return frappe.db.sql("select p.name, p.descripcion as description "
 			" from `tabProducto` as p inner join "
 			" `tabProducto Inventario` as i on "
 			" p.name = i.producto "
+			" where i.movimiento_inventario is null or i.movimiento_inventario = '' "
 			" order by p.name asc")
 
 	return frappe.db.sql("select p.name, p.descripcion as description "
@@ -34,5 +35,6 @@ def productos_almacen(doctype, txt, searchfield, start, page_len, filters):
 		" `tabProducto Inventario` as i on "
 		" p.name = i.producto "
 		" where i.parent = %s "
+		" and i.movimiento_inventario is null or i.movimiento_inventario = '' "
 		" order by p.name asc", almacen)
 
