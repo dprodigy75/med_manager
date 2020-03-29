@@ -8,19 +8,19 @@ from frappe.model.document import Document
 
 class MovimientoInventario(Document):
 	def validate(self):
-		if self.almacen_origen and self.almacen_destino			
-			if not frappe.db.exists("Almacen", {"name": self.almacen_origen}) 
-				throw("El Almacén: {0} no existe".format(self.almacen_origen))
+		if self.almacen_origen and self.almacen_destino:	
+			if not frappe.db.exists("Almacen", {"name": self.almacen_origen}):
+				frappe.throw("El Almacén: {0} no existe".format(self.almacen_origen))
 
-			if not frappe.db.exists("Almacen", {"name": self.almacen_destino}) 
-				throw("El Almacén: {0} no existe".format(self.almacen_destino))
+			if not frappe.db.exists("Almacen", {"name": self.almacen_destino}):
+				frappe.throw("El Almacén: {0} no existe".format(self.almacen_destino))
 			
 			for mvto in self.movimientos:
 				if not frappe.db.exists("Producto Inventario",  \
 					{"parent": self.almacen_origen, "producto": mvto.producto, "lote": mvto.lote, }):
-					throw("El producto {0} con lote {1} no fue encontrado".format( mvto.producto, mvto.lote))
+					frappe.throw("El producto {0} con lote {1} no fue encontrado en el almacén {2}".format( mvto.producto, mvto.lote, self.almacen_origen))
 			
-			throw("Todo ok")					
+			frappe.throw("Todo ok")					
 		else:
 			throw("Los datos del traspaso son inválidos")
 
@@ -30,13 +30,13 @@ def traspaso_almacen(almacen_origen, almacen_destino, producto, cantidad, lote):
 	if almacen_origen and almacen_destino and producto and cantidad > 0 and lote:
 		docAlmacen_origen = frappe.get_doc('Almacen', almacen_origen)
 		
-		if docAlmacen_origen
+		if docAlmacen_origen:
 			inventario = docAlmacen_origen.get("inventario")
 
-		else
-			throw("El Almacén: {0} no existe".format(almacen_origen))
+		else:
+			frappe.throw("El Almacén: {0} no existe".format(almacen_origen))
 	else:
-		throw("Los datos del traspaso son inválidos")
+		frappe.throw("Los datos del traspaso son inválidos")
 
 
 """ production_plans = []
@@ -84,22 +84,22 @@ def set_missing_values(source, target_doc):
 def productos_almacen(doctype, txt, searchfield, start, page_len, filters):
 	# Validate properties before merging
 	almacen = filters.get('almacen')
-	if almacen:
-		if not frappe.db.exists("Almacen", almacen):
-			throw("El Almacén: {0} no existe".format(almacen))
-	else:
-		return frappe.db.sql("select p.name, p.descripcion as description "
-			" from `tabProducto` as p inner join "
-			" `tabProducto Inventario` as i on "
-			" p.name = i.producto "
-			" where i.movimiento_inventario is null or i.movimiento_inventario = '' "
-			" order by p.name asc")
 
-	return frappe.db.sql("select p.name, p.descripcion as description "
-		" from `tabProducto` as p inner join "
-		" `tabProducto Inventario` as i on "
-		" p.name = i.producto "
-		" where i.parent = %s "
-		" and i.movimiento_inventario is null or i.movimiento_inventario = '' "
-		" order by p.name asc", almacen)
+	items = []
+
+	if almacen:
+		if frappe.db.exists("Almacen", almacen):
+			return frappe.db.sql("select p.name, p.descripcion as description "
+				" from `tabProducto` as p inner join "
+				" `tabProducto Inventario` as i on "
+				" p.name = i.producto "
+				" where i.parent = %s "
+				" and i.movimiento_inventario is null or i.movimiento_inventario = '' "
+				" order by p.name asc", almacen)
+		else:
+			frappe.throw("El Almacén: {0} no existe".format(almacen))
+	else:
+		frappe.throw("Valor de almacen es nulo")
+
+	return items
 
