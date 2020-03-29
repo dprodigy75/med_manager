@@ -4,7 +4,7 @@
 frappe.ui.form.on('Movimiento Inventario', {
 	refresh: function(frm) {
 
-		if(!(doc.almacen_origen == null))
+		if(!(frm.doc.almacen_origen == null))
 		{
 			cur_frm.set_query("producto", "movimientos", function(doc, cdt, cdn) {
 				var d = locals[cdt][cdn];
