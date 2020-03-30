@@ -15,23 +15,14 @@ class MovimientoInventario(Document):
 			if not frappe.db.exists("Almacen", {"name": self.almacen_destino}):
 				frappe.throw("El Almacén: {0} no existe".format(self.almacen_destino))
 			
-			try:
 				for mvto in self.movimientos:
-					item = frappe.db.get_value(
-						'Producto Inventario', \
-						['name', 'cantidad'], \
-						{'parent': self.almacen_origen,\
-						'producto': mvto.producto,\
-						'lote': mvto.lote },\
-						1,\
-						0,\
-						'Almacen')
-					
-					if(item.cantidad < mvto.cantidad):
-						frappe.throw("El producto {0} con lote {1} tiene solo {2} unidades disponibles, revise la solicitud"\
-							.format(mvto.producto, mvto.lote, mvto.cantidad))
-			except:
-  				frappe.throw("Ocurrio un error")
+					item = frappe.db.get_value('Producto Inventario', ['name', 'cantidad'], \
+						{'parent': self.almacen_origen, 'producto': mvto.producto,	'lote': mvto.lote },\
+						1, 0, 'Almacen')
+				
+				if(item.cantidad < mvto.cantidad):
+					frappe.throw("El producto {0} con lote {1} tiene solo {2} unidades disponibles, revise la solicitud"\
+						.format(mvto.producto, mvto.lote, mvto.cantidad))
 		else:
 			frappe.throw("Los datos del traspaso son inválidos")
 
