@@ -14,17 +14,58 @@ class MovimientoInventario(Document):
 
 			if not frappe.db.exists("Almacen", {"name": self.almacen_destino}):
 				frappe.throw("El Almacén: {0} no existe".format(self.almacen_destino))
+
+			if self.almacen_origen == self.almacen_destino:
+				frappe.throw("El Almacén origen y destino no pueden ser los mismos")
+
+			if self.fecha_recepcion and self.fecha_salida > self.fecha_recepcion:
+				frappe.throw("La fecha de recpción del material no puede ser anterior a la de salida")
 			
-				for mvto in self.movimientos:
-					item = frappe.db.get_value('Producto Inventario', ['name', 'cantidad'], \
-						{'parent': self.almacen_origen, 'producto': mvto.producto,	'lote': mvto.lote },\
-						1, 0, 'Almacen')
+			for mvto in self.movimientos:
+				cantidad = frappe.db.get_value('Producto Inventario', {'parent': self.almacen_origen, 'producto': mvto.producto,	'lote': mvto.lote },\
+					'cantidad')
 				
-				if(item.cantidad < mvto.cantidad):
+				if(cantidad < mvto.cantidad):
 					frappe.throw("El producto {0} con lote {1} tiene solo {2} unidades disponibles, revise la solicitud"\
-						.format(mvto.producto, mvto.lote, mvto.cantidad))
+						.format(mvto.producto, mvto.lote, cantidad))
 		else:
 			frappe.throw("Los datos del traspaso son inválidos")
+	
+	def afterInsert(self):
+		almacen = frappe.get_doc("Almacen", self.almacen_origen)
+
+		for mvto in self.movimientos:
+			produco_almacen_origen = frappe.get_doc("Producto Inventario", null, \
+				{'parent': self.almacen_origen, 'producto': mvto.producto, 'lote': mvto.lote, 'parentfield': inventario })
+			
+			if produco_almacen_origen:
+				frappe.db.set_value('Producto Inventario', produco_almacen.name, \
+					{ 'cantidad': producto_almacen - mvto.cantidad })
+			else:
+				frappe.throw("Producto {0} no encontrado en almacén {1}".format(mvto.producto, self.almacen_origen))
+
+			produco_almacen_transitorio = frappe.get_doc("Producto Inventario", \
+				{ 'producto': mvto.producto, 'lote': mvto.lote, 'cantidad': mvto.cantidad, \
+				'unidad': mvto.unidad, 'fecha_caducidad': mvto.fecha_caducidad, \
+				'movimiento_inventario': self.name })
+
+			if produco_almacen_transitorio:
+				almacen.append("transitorio", produco_almacen_transitorio)
+			else:
+				frappe.throw("Producto {0} inválido".format(mvto.producto))
+		
+		almacen.save()
+
+		# frappe.db.commit()     
+ 
+
+
+# update multiple values
+# frappe.db.set_value('Task', 'TASK00002', {
+#     'subject': 'New Subject',
+#     'description': 'New Description'
+# })
+
 
 @frappe.whitelist()
 def traspaso_almacen(almacen_origen, almacen_destino, producto, cantidad, lote):
