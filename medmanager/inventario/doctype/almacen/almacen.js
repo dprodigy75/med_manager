@@ -6,6 +6,5 @@ frappe.ui.form.on('Almacen', {
 
 	},
 	onload: function(frm) {
-		
 	},
 });
