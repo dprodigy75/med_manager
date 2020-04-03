@@ -1,0 +1,8 @@
+{
+    "js/medmanager.min.js": [
+        "public/js/medmanager.js"
+    ],
+    "css/medmanager.min.css": [
+		"public/css/medmanager.css"
+	]
+}

@@ -1,7 +1,7 @@
 // Copyright (c) 2020, Brandmand and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('Movimiento Inventario', {
+frappe.ui.form.on('Traspaso Inventario', {
 	refresh: function(frm) {
 
 		if(!(frm.doc.almacen_origen == null))
@@ -10,15 +10,11 @@ frappe.ui.form.on('Movimiento Inventario', {
 		}
 	},
 	onload: function(frm) {
-		SetWorkingData();
-
 		if(frm.doc.docstatus == 0)
 		{
 			cur_frm.clear_table("movimientos");
 		}
 		
-		EstableceFiltroOrigen(frm, cur_frm);
-
 		frm.toggle_display(['movimientos'], !(frm.doc.almacen_origen == null));
 	},
 	validate: function(frm) {
@@ -151,37 +147,22 @@ frappe.ui.form.on('Producto Mvto Inventario', {
 	}
 });
 
-function EstableceFiltroOrigen(frm, cur_frm) {
-	cur_frm.set_query('almacen_origen', function () {
-		return {
-			filters: [
-				["Almacen", "activo", "=", 1]
-			]
-		};
-	});
-}
-
 function EstableceFiltros(frm, cur_frm) {
 	cur_frm.set_query("producto", "movimientos", function (doc, cdt, cdn) {
 		var d = locals[cdt][cdn];
 		var data = { "almacen": doc.almacen_origen };
 		return {
-			query: "medmanager.inventario.doctype.movimiento_inventario.movimiento_inventario.productos_almacen",
+			query: "medmanager.inventario.doctype.traspaso_inventario.traspaso_inventario.productos_almacen",
 			filters: {
 				almacen: doc.almacen_origen
-				, activo: 1
 			}
 		};
 	});
 	cur_frm.set_query('almacen_destino', function () {
 		return {
 			filters: [
-				["Almacen", "name", "!=", frm.doc.almacen_origen],
-				["Almacen", "activo", "=", 1],
+				["Almacen", "name", "!=", frm.doc.almacen_origen]
 			]
 		};
 	});
 }
-
-
-

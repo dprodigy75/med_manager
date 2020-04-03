@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 
-class MovimientoInventario(Document):
+class TraspasoInventario(Document):
 	def validate(self):
 		if self.almacen_origen and self.almacen_destino:	
 			if not frappe.db.exists("Almacen", {"name": self.almacen_origen}):
@@ -31,7 +31,7 @@ class MovimientoInventario(Document):
 		else:
 			frappe.throw("Los datos del traspaso son inválidos")
 	
-	def after_insert(self):
+	def afterInsert(self):
 		for mvto in self.movimientos:
 			name_producto_origen = frappe.db.get_value('Producto Inventario', \
 				{'parent': self.almacen_origen, 'producto': mvto.producto, \
@@ -47,7 +47,7 @@ class MovimientoInventario(Document):
 				nueva_cantidad = produco_origen.cantidad - mvto.cantidad
 				produco_origen.update({ "cantidad": nueva_cantidad })
 				produco_origen.save()
-				frappe.db.commit()
+				# frappe.db.commit()
 			else:
 				frappe.throw("Producto {0} no encontrado en almacén {1}".format(mvto.producto, self.almacen_origen))
 			
@@ -77,7 +77,7 @@ class MovimientoInventario(Document):
 			self.devolver_traspaso()
 
 	def devolver_traspaso(self):
-		for mvto in self.movimientos:
+		for mvto in self.tabla1:
 			name_producto = frappe.db.get_value('Producto Inventario', {'parent': self.almacen_origen, 'producto': mvto.producto, 'lote': mvto.lote, 'parentfield': 'inventario' },\
 					'name')
 
@@ -117,7 +117,7 @@ class MovimientoInventario(Document):
 					nueva_cantidad = producto_destino.cantidad + mvto.cantidad					
 					producto_destino.update({ "cantidad": nueva_cantidad })						
 					producto_destino.save()
-					frappe.db.commit()
+					# frappe.db.commit()
 				else:
 					frappe.throw("Producto {0} no encontrado en almacén {1}".format(mvto.producto, self.almacen_destino))
 
@@ -172,7 +172,6 @@ def productos_almacen(doctype, txt, searchfield, start, page_len, filters):
 				" `tabProducto Inventario` as i on "
 				" p.name = i.producto "
 				" where i.parent = %s "
-				" and i.parentfield = ""inventario"""
 				" and i.movimiento_inventario is null or i.movimiento_inventario = '' "
 				" order by p.name asc", almacen)
 		else:
@@ -181,4 +180,5 @@ def productos_almacen(doctype, txt, searchfield, start, page_len, filters):
 		frappe.throw("Valor de almacen es nulo")
 
 	return items
+
 
