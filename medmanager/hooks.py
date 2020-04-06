@@ -15,8 +15,7 @@ app_license = "MIT"
 # ------------------
 
 # include js, css files in header of desk.html
-app_include_css = "/assets/medmanager/css/medmanager.min.css"
-app_include_js = "/assets/medmanager/js/medmanager.min.js"
+app_include_css = "/assets/medmanager/css/medmanager.css"
 app_include_js = "/assets/medmanager/js/medmanager.js"
 
 # include js, css files in header of web template
@@ -68,9 +67,9 @@ app_include_js = "/assets/medmanager/js/medmanager.js"
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
+permission_query_conditions = {
+	"Almacen": "medmanager.inventario.doctype.almacen.almacen.get_permission_query_conditions",
+}
 #
 # has_permission = {
 # 	"Event": "frappe.desk.doctype.event.event.has_permission",

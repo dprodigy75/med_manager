@@ -1,11 +1,111 @@
 var dialogo;
-var empresa;
-var cliente;
-var area;
-var unidad_medica;
 
 var clientes = null;
 var empresas = null;
+
+$( document ).ready(function() {
+	console.log( "ready!" );
+	//debugger;
+	//  let page = frappe.ui.make_app_page({
+	//  	title: 'My Page',
+	//  	parent: cur_frm.form_wrapper, // HTML DOM Element or jQuery object
+	//  	single_column: true // create a page without sidebar
+	// })
+	
+	//cur_frm.appframe.buttons.Submit.remove();
+
+
+	//page.set_title_sub('Subtitle');
+	//cur_frm.appframe.set_title_sub('Subtitle');
+});
+
+
+class Contexto {
+	constructor(empresa, area, cliente, unidadMedica) {
+		this.Empresa = empresa;
+		this.Area = area;
+		this.Cliente = cliente;
+		this.UnidadMedica = unidadMedica;
+	};
+
+	GetString() {
+		var cadena = '';
+
+		if(!(this.Empresa==null) && this.Empresa!=="")
+		{
+			cadena += this.Empresa;
+		}
+
+		if(!(this.Area==null) && this.Area!=="")
+		{
+			cadena += " > " + this.Area;
+		}
+
+		if(!(this.Cliente==null) && this.Cliente!=="")
+		{
+			cadena += " > " + this.Cliente;
+		}
+
+		if(!(this.UnidadMedica==null) && this.UnidadMedica!=="")
+		{
+			cadena += " > " + this.UnidadMedica;
+		}
+
+		return cadena;
+	}
+}
+
+function getContexto()
+{
+	var obj = localStorage.getItem('Contexto');
+
+	if(!(obj == null))
+	{
+		var parsedObj = JSON.parse(obj);
+
+		if(!(parsedObj == null))
+		{
+			return new Contexto(
+					parsedObj.Empresa,
+					parsedObj.Area,
+					parsedObj.Cliente,
+					parsedObj.UnidadMedica
+				);
+		}
+	}
+
+	return null;
+}
+
+function setContexto(contexto)
+{
+	if(contexto == null)
+	{
+		return false;
+	}
+
+	if(contexto instanceof Contexto)
+	{
+		localStorage.setItem('Contexto', JSON.stringify(contexto));
+		return true;
+	}
+
+	try{
+		var parsedObj = JSON.parse(contexto);
+
+		var obj = new Contexto(parsedObj.Empresa, parsedObj.Area, parsedObj.Cliente, parsedObj.UnidadMedica);
+
+		localStorage.setItem('Contexto', JSON.stringify(obj));
+		
+		return true;
+	} catch(err)
+	{
+		console.log(err);
+	}
+
+	return false;
+}
+
 
 async function CargaEmpresas()
 {
@@ -18,7 +118,7 @@ async function CargaEmpresas()
 			},
 			fields: [
 				"name",
-				"nombre"
+				"abreviacion"
 			],
 		}
 	});
@@ -43,7 +143,7 @@ async function CargaClientes(empresa)
 			},
 			fields: [
 				"name",
-				"razon_social"
+				"abreviacion"
 			],	
 		}
 	});
@@ -67,7 +167,7 @@ function CargaDialogo(lstEmpresas, lstClientes) {
 						
 						if(!(clientes==null))
 						{
-							var lstClientes = getFormatedOptions(clientes, 'razon_social');
+							var lstClientes = getFormatedOptions(clientes, 'abreviacion');
 
 							dialogo.fields_list[1].df.options = lstClientes;
 
@@ -97,13 +197,17 @@ function CargaDialogo(lstEmpresas, lstClientes) {
 		],
 		primary_action_label: 'Aceptar',
 		primary_action(values) {
-			empresa = values.empresa;
-			cliente =  values.cliente;
-			area =  values.area;
+			var empresa = values.empresa;
+			var cliente =  values.cliente;
+			var area =  values.area;
 			
 			console.log(empresa);
 			console.log(area);
 			console.log(cliente);
+
+			var contexto = new Contexto(empresa, area, cliente, '');
+
+			setContexto(contexto);			
 
 			dialogo.hide();
 		}
@@ -133,3 +237,16 @@ function getFormatedOptions(listaObjetos, campoDescripcion)
 	return lstOpciones;
 }
 
+function getUnformatedOptions(campoDescripcion)
+{
+	if(!(campoDescripcion == null))
+	{
+		var indice = campoDescripcion.indexOf("-", 0);
+
+		if (indice > 0) {
+			return (campoDescripcion.substring(0, indice - 1)).trim();
+		}
+	}
+
+	return campoDescripcion;
+}

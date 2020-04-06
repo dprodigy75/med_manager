@@ -1,3 +1,25 @@
 li.dropdown.dropdown-help.dropdown-mobile {
     display: none;
 }
+
+
+/* .page-actions .sub-heading {
+    max-width: 50%;
+    overflow: hidden;
+    font-size: xx-small;
+} */
+
+.form-inner-toolbar {
+    padding: 5px 15px 0px;
+}
+
+.inner-page-message {
+    font-weight: bold;
+    padding-right: 15px;
+    color: rgb(82, 146, 247) !important;
+}
+
+.form-inner-toolbar .btn
+{
+    margin-bottom: 5px;
+}
