@@ -2,21 +2,9 @@ var dialogo;
 
 var clientes = null;
 var empresas = null;
+var unidades = null;
 
 $( document ).ready(function() {
-	console.log( "ready!" );
-	//debugger;
-	//  let page = frappe.ui.make_app_page({
-	//  	title: 'My Page',
-	//  	parent: cur_frm.form_wrapper, // HTML DOM Element or jQuery object
-	//  	single_column: true // create a page without sidebar
-	// })
-	
-	//cur_frm.appframe.buttons.Submit.remove();
-
-
-	//page.set_title_sub('Subtitle');
-	//cur_frm.appframe.set_title_sub('Subtitle');
 });
 
 
@@ -59,7 +47,7 @@ function getContexto()
 {
 	var obj = localStorage.getItem('Contexto');
 
-	if(!(obj == null))
+	if(!(obj == null) && (obj!==''))
 	{
 		var parsedObj = JSON.parse(obj);
 
@@ -75,6 +63,11 @@ function getContexto()
 	}
 
 	return null;
+}
+
+function clearContexto()
+{
+	localStorage.setItem('Contexto', null);
 }
 
 function setContexto(contexto)
@@ -126,12 +119,7 @@ async function CargaEmpresas()
 
 async function CargaClientes(empresa)
 {
-	var indice = empresa.indexOf("-", 0);
-
-	if(indice > 0)
-	{
-		empresa = (empresa.substring(0, indice -1)).trim();
-	}
+	empresa = getUnformatedOptions(empresa);
 
 	return await frappe.call({
 		method:'frappe.client.get_list',
@@ -149,7 +137,30 @@ async function CargaClientes(empresa)
 	});
 }
 
-function CargaDialogo(lstEmpresas, lstClientes) {
+
+async function CargaUnidades(cliente)
+{
+	cliente = getUnformatedOptions(cliente);	
+	//unidad_medica
+	return await frappe.call({
+		method:'frappe.client.get_list',
+		args: {
+			doctype: 'Unidad Medica',
+			filters: {
+				'activo': 1,
+				'cliente': cliente
+			},
+			fields: [
+				"name",
+				"nombre"
+			],	
+		}
+	});
+}
+
+
+
+function CargaDialogo(lstEmpresas, lstClientes, lstUnidades, callback) {
 
 	dialogo = new frappe.ui.Dialog({
 		title: 'Seleccione los parámetros de trabajo para la pagina actual',
@@ -169,20 +180,12 @@ function CargaDialogo(lstEmpresas, lstClientes) {
 						{
 							var lstClientes = getFormatedOptions(clientes, 'abreviacion');
 
-							dialogo.fields_list[1].df.options = lstClientes;
+							dialogo.fields_list[2].df.options = lstClientes;
 
-							//dialogo.fields_list[1].set_options();
-							dialogo.fields_list[1].set_formatted_input();
+							dialogo.fields_list[2].set_formatted_input();
 						}
 					});					
 				}
-			},
-			{
-				label: 'Cliente',
-				fieldname: 'cliente',
-				fieldtype: 'Select',
-				reqd: 1,
-				options: lstClientes
 			},
 			{
 				label: 'Area',
@@ -193,6 +196,35 @@ function CargaDialogo(lstEmpresas, lstClientes) {
 					'SIA',
 					'SIO'
 				]
+			},
+			{
+				label: 'Cliente',
+				fieldname: 'cliente',
+				fieldtype: 'Select',
+				options: lstClientes,
+				reqd: 1,
+				onchange: function(e) {
+
+					CargaUnidades(this.value).then(function(resp){						
+						unidades = resp.message;				
+						
+						if(!(unidades==null))
+						{
+							var lstUnidades = getFormatedOptions(unidades, 'nombre');
+
+							dialogo.fields_list[3].df.options = lstUnidades;
+
+							dialogo.fields_list[3].set_formatted_input();
+						}
+					});					
+				}
+			},
+			{
+				label: 'Unidad Médica',
+				fieldname: 'unidadMedica',
+				fieldtype: 'Select',
+				options: lstUnidades,
+				reqd: 1
 			}
 		],
 		primary_action_label: 'Aceptar',
@@ -200,20 +232,50 @@ function CargaDialogo(lstEmpresas, lstClientes) {
 			var empresa = values.empresa;
 			var cliente =  values.cliente;
 			var area =  values.area;
+			var unidadMedica = values.unidadMedica;
 			
 			console.log(empresa);
 			console.log(area);
 			console.log(cliente);
+			console.log(unidadMedica);
 
-			var contexto = new Contexto(empresa, area, cliente, '');
+			var contexto = new Contexto(empresa, area, cliente, unidadMedica);
 
-			setContexto(contexto);			
+			if(setContexto(contexto))
+			{
+				if(frappe.db.exists("Relacion Usuario", frappe.session.user))
+				{
+					guardaRelacion(contexto, frappe.session.user);
+							
+					if(!(callback==null))
+					{
+						callback();
+					}						
+				}
+			}
 
 			dialogo.hide();
 		}
 	});	
 
 	dialogo.show();
+}
+
+function guardaRelacion(contexto, user)
+{
+	if(!(contexto==null) || !(user==null))
+	{
+		try
+		{
+			frappe.db.set_value("Relacion Usuario", user, "empresa", getUnformatedOptions(contexto.Empresa));	
+			frappe.db.set_value("Relacion Usuario", user, "rea", contexto.Area);
+			frappe.db.set_value("Relacion Usuario", user, "cliente", getUnformatedOptions(contexto.Cliente));
+			frappe.db.set_value("Relacion Usuario", user, "unidad_medica", getUnformatedOptions(contexto.UnidadMedica));
+		}catch(err)
+		{
+			console.log(err);
+		}
+	}
 }
 
 async function CargaRelacionUsuario(){
