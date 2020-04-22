@@ -8,14 +8,63 @@ frappe.ui.form.on('Solicitud Procedimiento', {
 	cliente: function(frm) {
 		EstableceFiltroUnidad(frm, cur_frm);
 	},
-	tipo_procedimiento: function(frm) {
+	contrato: function(frm) {
+		EstableceFiltroPartidas(frm, cur_frm);
 
+		EstableceAlmacen(frm, cur_frm);
+
+		frappe.call({
+			method:'frappe.client.get',
+			args: {
+				doctype: 'Contrato SIO',
+				filters: {
+					'name': frm.doc.contrato
+				}
+			}, 
+			callback: function(resp) { 
+				if(resp==null || resp.message==null)
+				{
+					frappe.throw("Ocurrió un error al cargar el contrato seleccionado")
+					return;
+				}
+
+				//TODO
+				frm.set_value("costo", resp.message.partidas[0].precio);
+
+				$.each(resp.message.subpartidas, function( index, element ) {
+
+					var d = frappe.model.add_child(frm.doc, "Producto Folio", "insumos", 0);
+
+					d.producto = element.producto;
+					d.costo_unitario = element.precio_venta;
+					d.unidad_medida = d.unidad_medida;
+					d.parentfield = 'insumos';				
+				});	
+				
+				cur_frm.refresh();
+			}
+		});
+	
+	},	
+	tipo_procedimiento: function(frm) {			
 	},
 	unidad_medica: function(frm) {
 		EstableceAlmacen(frm,cur_frm);
 	},
 	onload: function(frm) {
 		EstableceFiltros(frm, cur_frm);
+
+		if(frm.doc.docstatus == 0 && frm.doc.__unsaved == 1)
+		{
+			var contexto = getContexto();
+
+			if(!(contexto==null))
+			{
+				frm.set_value("empresa", getUnformatedOptions(contexto.Empresa));
+			}
+
+			cur_frm.clear_table("insumos");
+		}
 		
 		frm.set_query('medico', () => {
 			return {
@@ -72,9 +121,6 @@ frappe.ui.form.on('Producto Folio', {
 				var lote = frappe.meta.get_docfield(row.doctype, "lote", cur_frm.doc.name);
 
 				lote.options = lotes;
-
-				//frm.refresh_field(lote);
-				cur_frm.refresh();
 			}
 		});
 	},
@@ -96,25 +142,30 @@ frappe.ui.form.on('Producto Folio', {
 		{
 			if(total < costo_base)
 			{
-				frm.set_value('indicador_costo', '#00FF00');
+				frm.set_value('costo_indicador_ok', 'Dentro de presupuesto');
+				frm.set_value('costo_indicador_warning', '');
+				frm.set_value('costo_indicador_error', '');
 			}
 			else
 			{
 				var costo_base10 = (costo_base*(1.10));
-				console.log(costo_base10);
-				console.log(total);
+
 				if(costo_base10 > total)
 				{
-					frm.set_value('indicador_costo', '#FFFF00');
+					frm.set_value('costo_indicador_ok', '');
+					frm.set_value('costo_indicador_warning', 'Ligeramente fuera de presupuesto');
+					frm.set_value('costo_indicador_error', '');
 				}
 				else
 				{
-					frm.set_value('indicador_costo', '#FF0000');
+					frm.set_value('costo_indicador_ok', '');
+					frm.set_value('costo_indicador_warning', '');
+					frm.set_value('costo_indicador_error', 'Completamente fuera de presupuesto');
 				}
 			}
 		}
 
-		cur_frm.refresh();
+		//cur_frm.refresh();
 	},
 	lote: function(frm, cdt, cdn) {
 		let row = frappe.get_doc(cdt, cdn);
@@ -222,6 +273,19 @@ function EstableceFiltroServicios(frm, cur_frm) {
 	});
 }
 
+
+function EstableceFiltroPartidas(frm, cur_frm) {
+	var contexto = getContexto();
+
+	cur_frm.set_query('tipo_procedimiento', function () {
+		return {
+			filters: [
+				["Catalogo de Servicios", "activo", "=", 1],
+				["Catalogo de Servicios", "empresa", "=", getUnformatedOptions(contexto.Empresa)]
+			]
+		};
+	});
+}
 
 
 function EstableceFiltroCliente(frm, cur_frm) {

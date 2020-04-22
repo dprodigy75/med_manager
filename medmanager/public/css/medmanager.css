@@ -23,3 +23,25 @@ li.dropdown.dropdown-help.dropdown-mobile {
 {
     margin-bottom: 5px;
 }
+
+/* 
+[data-fieldname='indicador_costo'] > .value { 
+    color:green; 
+    background-color:green;
+    width: 80px;
+}  */
+
+[data-fieldname$='indicador_ok'] > .form-group > .control-input-wrapper { 
+    color: rgb(13, 172, 13) !important; 
+    font-weight: bold;
+}
+
+[data-fieldname$='indicador_warning'] > .form-group > .control-input-wrapper { 
+    color: rgb(255, 208, 0) !important; 
+    font-weight: bold;
+}
+
+[data-fieldname$='indicador_error'] > .form-group > .control-input-wrapper { 
+    color: rgb(202, 9, 9) !important; 
+    font-weight: bold;
+}

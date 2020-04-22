@@ -71,6 +71,7 @@ frappe.ui.form.on('Contrato SIO', {
 			d.marca = parent.marca_new;
 			d.modelo = parent.modelo_new;
 			d.pais = parent.pais_new;
+			d.clave = parent.clave_new;
 			d.parentfield = 'subpartidas';		
 		}
 
@@ -110,6 +111,7 @@ function clearNew(frm)
 	frm.set_value('marca_new', '');
 	frm.set_value('modelo_new', '');
 	frm.set_value('pais_new', '');
+	frm.set_value('clave_new', '');	
 }
 
 function cargaPartidasNew(frm)
