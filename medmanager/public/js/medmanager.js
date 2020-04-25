@@ -8,61 +8,174 @@ $( document ).ready(function() {
 });
 
 
+
+
 class Contexto {
-	constructor(empresa, area, cliente, unidadMedica) {
+	constructor(empresa, etiquetaEmpresa, area, etiquetaArea, cliente, etiquetaCliente, unidadMedica, etiquetaUnidadMedica) {
 		this.Empresa = empresa;
+		this.EtiquetaEmpresa = etiquetaEmpresa;
 		this.Area = area;
+		this.EtiquetaArea = etiquetaArea;
 		this.Cliente = cliente;
+		this.EtiquetaCliente = etiquetaCliente;
 		this.UnidadMedica = unidadMedica;
+		this.EtiquetaUnidadMedica = etiquetaUnidadMedica;
+		this.TipoRelacion = null;
 	};
 
-	GetString() {
+	EsValido(nivel) {
+		if(nivel==null)
+		{
+			nivel == currentNivel;
+		}
+
+		if(nivel==null)
+		{
+			return false;
+		}
+
+		var empresaValida = IsNotEmpty(this.Empresa);
+
+		if(nivel=="EMPRESA")
+		{
+			if(empresaValida)
+			{
+				return true;
+			}
+		}
+
+		var areaValida = IsNotEmpty(this.Area);
+
+		if(nivel=="AREA")
+		{
+			if(empresaValida && areaValida)
+			{
+				return true;
+			}
+		}
+
+		var clienteValido = IsNotEmpty(this.Cliente);
+
+		if(nivel=="CLIENTE")
+		{
+			if(empresaValida && areaValida && clienteValido)
+			{
+				return true;
+			}
+		}
+
+		var unidadMedicaValida = IsNotEmpty(this.UnidadMedica);
+
+		if(nivel=="UNIDAD_MEDICA")
+		{
+			if(empresaValida && areaValida && clienteValido && unidadMedicaValida)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	GetString(nivel) {
 		var cadena = '';
 
-		if(!(this.Empresa==null) && this.Empresa!=="")
-		{
-			cadena += this.Empresa;
-		}
+		var empresaValida = IsNotEmpty(this.Empresa);
+		var areaValida = IsNotEmpty(this.Area);
+		var clienteValido = IsNotEmpty(this.Cliente);
+		var unidadMedicaValida = IsNotEmpty(this.UnidadMedica);
 
-		if(!(this.Area==null) && this.Area!=="")
-		{
-			cadena += " > " + this.Area;
-		}
+		if(nivel==null || nivel==='') {
+			if(empresaValida) {
+				cadena += this.Empresa + " - " + this.EtiquetaEmpresa;
+			}
 
-		if(!(this.Cliente==null) && this.Cliente!=="")
-		{
-			cadena += " > " + this.Cliente;
-		}
+			if(areaValida) {
+				cadena += " » " + this.EtiquetaArea;
+			}
 
-		if(!(this.UnidadMedica==null) && this.UnidadMedica!=="")
-		{
-			cadena += " > " + this.UnidadMedica;
+			if(clienteValido) {
+				cadena += " » " + this.Cliente + " - " + this.EtiquetaCliente;
+			}
+
+			if(unidadMedicaValida) {
+				cadena += " » " + this.UnidadMedica + " - " + this.EtiquetaUnidadMedica;
+			}
+		}
+		else {
+			switch (nivel) {
+				case "EMPRESA":
+					if(empresaValida) {
+						cadena += this.Empresa + " - " + this.EtiquetaEmpresa;
+					}
+					break;
+				case "AREA":
+					if(empresaValida && areaValida)
+					{
+						cadena = this.Empresa + " - " + this.EtiquetaEmpresa + " » " + this.EtiquetaArea;
+					}
+					break;
+				case "CLIENTE":
+					if(empresaValida && areaValida && clienteValido)
+					{
+						cadena = this.Empresa + " - " + this.EtiquetaEmpresa + " » " + this.EtiquetaArea + " » " + this.Cliente + " - " + this.EtiquetaCliente;
+					}
+					break;
+				case "UNIDAD_MEDICA":
+					if(empresaValida && areaValida && clienteValido && unidadMedicaValida)
+					{
+						cadena = this.Empresa + " - " + this.EtiquetaEmpresa + " » " + this.EtiquetaArea + " » " + this.Cliente + " - " + this.EtiquetaCliente + " » " + this.UnidadMedica + " - " + this.EtiquetaUnidadMedica;
+					}
+					break;
+			}
 		}
 
 		return cadena;
 	}
 }
 
-function getContexto()
+async function getContexto()
 {
-	var obj = localStorage.getItem('Contexto');
-
-	if(!(obj == null) && (obj!==''))
-	{
-		var parsedObj = JSON.parse(obj);
-
-		if(!(parsedObj == null))
+	return cargaRelacionUsuario().then(function(resp){
+		if(resp==null)
 		{
-			return new Contexto(
-					parsedObj.Empresa,
-					parsedObj.Area,
-					parsedObj.Cliente,
-					parsedObj.UnidadMedica
-				);
+			return null;
 		}
-	}
 
-	return null;
+		if(resp.message==null)
+		{
+			return null;
+		}
+
+		var relacion = resp.message;
+
+		var obj = localStorage.getItem('Contexto');
+
+		if(!(obj == null) && (obj!==''))
+		{
+			var parsedObj = JSON.parse(obj);
+	
+			if(!(parsedObj == null))
+			{
+				var contexto = new Contexto(
+						parsedObj.Empresa,
+						parsedObj.EtiquetaEmpresa,
+						parsedObj.Area,
+						parsedObj.EtiquetaArea,
+						parsedObj.Cliente,
+						parsedObj.EtiquetaCliente,
+						parsedObj.UnidadMedica,
+						parsedObj.EtiquetaUnidadMedica
+					);
+
+				contexto.TipoRelacion = relacion.tipo_relacion;
+
+				return contexto;
+			}
+		}
+
+		return null;
+	});		
 }
 
 function clearContexto()
@@ -86,7 +199,16 @@ function setContexto(contexto)
 	try{
 		var parsedObj = JSON.parse(contexto);
 
-		var obj = new Contexto(parsedObj.Empresa, parsedObj.Area, parsedObj.Cliente, parsedObj.UnidadMedica);
+		var obj = new Contexto(
+			parsedObj.Empresa,
+			parsedObj.EtiquetaEmpresa,
+			parsedObj.Area,
+			parsedObj.EtiquetaArea,
+			parsedObj.Cliente,
+			parsedObj.EtiquetaCliente,
+			parsedObj.UnidadMedica,
+			parsedObj.EtiquetaUnidadMedica
+		);
 
 		localStorage.setItem('Contexto', JSON.stringify(obj));
 		
@@ -127,7 +249,7 @@ async function CargaEmpresas()
 
 async function CargaClientes(empresa)
 {
-	empresa = getUnformatedOptions(empresa);
+	empresa = obtieneIdentificador(empresa);
 
 	return await frappe.call({
 		method:'frappe.client.get_list',
@@ -146,9 +268,9 @@ async function CargaClientes(empresa)
 }
 
 
-async function CargaUnidades(cliente)
+async function CargaUnidades(empresa, cliente)
 {
-	cliente = getUnformatedOptions(cliente);	
+	cliente = obtieneIdentificador(cliente);	
 	//unidad_medica
 	return await frappe.call({
 		method:'frappe.client.get_list',
@@ -156,6 +278,7 @@ async function CargaUnidades(cliente)
 			doctype: 'Unidad Medica',
 			filters: {
 				'activo': 1,
+				'empresa': empresa,
 				'cliente': cliente
 			},
 			fields: [
@@ -168,16 +291,219 @@ async function CargaUnidades(cliente)
 
 var currentNivel = null;
 var currentListView = null;
-var currentDocTypeName = null;
+var currentDocTypeNameLst = null;
+var currentDocTypeNameFrm = null;
 var strCampoEmpresa = 'abreviacion';
 var strCampoCliente = 'abreviacion';
+var strCampoUnidadMedica = 'nombre';
 
-function cambiaRelacionUsuarioListView(listView, currentDocTypeName, currentNivel)
+function cambiaRelacionUsuarioListView(listView, currentDocTypeNameLst, currentNivel)
 {
     clearContexto();
 
-    estableceContextoListView(listView, currentDocTypeName, currentNivel);
+    estableceContextoListView(listView, currentDocTypeNameLst, currentNivel);
 }
+
+
+function cambiaRelacionUsuarioForm(frm, currentDocTypeNameFrm, currentNivel)
+{
+    clearContexto();
+
+    estableceContextoForm(frm, currentDocTypeNameFrm, currentNivel);
+}
+
+function estableceContextoForm(frm, docTypeName, nivel) {
+    if(frm == null)
+    {
+        frm = cur_frm;
+	}
+	
+	if(docTypeName == null)
+	{
+		docTypeName = currentDocTypeNameFrm;
+	}
+
+	if(nivel == null)
+	{
+		nivel = currentNivel;
+	}
+
+	var contexto = null;
+	
+	getContexto().then(function(resp){
+		contexto = resp;   
+		
+
+		if (contexto == null || !(contexto.EsValido(nivel))) {
+			cargaDatosSesion(nivel, estableceContextoForm);
+		}
+		else {
+			frm.page.add_inner_message(contexto.GetString(nivel));
+
+			if(nivel!=="EMPRESA")
+			{
+				if(nivel=="AREA")
+				{
+					if(!(contexto.Area==null))
+					{
+						frm.set_value('empresa', obtieneIdentificador(contexto.Empresa));
+						frm.set_df_property('empresa', 'read_only', 1);
+						frm.refresh_field('empresa');
+						frm.set_value('area', obtieneIdentificador(contexto.Area));
+						frm.set_df_property('area', 'read_only', 1);
+						frm.refresh_field('area');
+					}        
+				}
+				else
+				{
+					if(nivel=="CLIENTE")
+					{
+						if(!(contexto.Cliente==null))
+						{
+							frm.set_value('empresa', obtieneIdentificador(contexto.Empresa));
+							frm.set_df_property('empresa', 'read_only', 1);
+							frm.refresh_field('empresa');
+							frm.set_value('area', obtieneIdentificador(contexto.Area));
+							frm.set_df_property('area', 'read_only', 1);
+							frm.refresh_field('area');
+							frm.set_value('cliente', obtieneIdentificador(contexto.Cliente));
+							frm.set_df_property('cliente', 'read_only', 1);
+							frm.refresh_field('cliente');
+						}        
+					}
+					else
+					{
+						if(nivel=="UNIDAD_MEDICA")
+						{
+							if(!(contexto.UnidadMedica==null))
+							{
+								frm.set_value('empresa', obtieneIdentificador(contexto.Empresa));
+								frm.set_df_property('empresa', 'read_only', 1);
+								frm.refresh_field('empresa');
+								frm.set_value('area', obtieneIdentificador(contexto.Area));
+								frm.set_df_property('area', 'read_only', 1);
+								frm.refresh_field('area');
+								frm.set_value('cliente', obtieneIdentificador(contexto.Cliente));
+								frm.set_df_property('cliente', 'read_only', 1);
+								frm.refresh_field('cliente');
+								frm.set_value('unidad_medica', obtieneIdentificador(contexto.UnidadMedica));
+								frm.set_df_property('unidad_medica', 'read_only', 1);
+								frm.refresh_field('unidad_medica');
+								frm.set_value('area', contexto.Area);
+								frm.set_df_property('area', 'read_only', 1);
+								frm.refresh_field('area');
+							}        
+						}
+					}
+				}
+			}
+			else
+			{
+				frm.set_value('empresa', obtieneIdentificador(contexto.Empresa));
+				frm.set_df_property('empresa', 'read_only', 1);
+				frm.refresh_field('empresa');
+			}
+		}
+	});
+}
+
+
+function filtroCliente(frm, agregaDatos, empresa) {
+
+	var filtros = [
+		["Cliente", "activo", "=", 1]
+	];
+
+	if(!(agregaDatos==null)&&agregaDatos)
+	{
+		var contexto = null;
+		
+		getContexto().then(function(resp){ 
+			contexto = resp;
+
+			if(empresa==null)
+			{
+				empresa = contexto.Empresa;
+			}
+		
+			filtros.push(["Cliente", "empresa", "=", empresa]);
+
+			cur_frm.set_query('cliente', function () {
+				return {
+					filters: filtros
+				};
+			});
+		});
+	}
+	else
+	{
+		filtros.push(["Cliente", "empresa", "=", empresa]);
+
+		cur_frm.set_query('cliente', function () {
+			return {
+				filters: filtros
+			};
+		});
+	}
+}
+
+function filtroUnidad(frm, agregaDatos, empresa, cliente) {
+
+	var filtros = [
+		["Unidad Medica", "activo", "=", 1]
+	];
+
+	if(!(agregaDatos==null) && agregaDatos)
+	{
+		var contexto = null;
+		getContexto().then(function(resp){ 
+			contexto = resp;
+
+			if(empresa==null)
+			{
+				empresa = contexto.Empresa;
+			}
+
+			filtros.push(["Unidad Medica", "empresa", "=", empresa]);
+
+			if(cliente==null)
+			{
+				cliente = contexto.Cliente;
+			}
+			
+			filtros.push(["Unidad Medica", "cliente", "=", cliente]);
+
+			cur_frm.set_query('cliente', function () {
+				return {
+					filters: filtros
+				};
+			});
+		});
+	}
+	else
+	{
+		filtros.push(["Unidad Medica", "empresa", "=", empresa]);
+		filtros.push(["Unidad Medica", "cliente", "=", cliente]);
+
+		cur_frm.set_query('cliente', function () {
+			return {
+				filters: filtros
+			};
+		});
+	}
+}
+
+// function filtroUnidad(frm, empresa, cliente, area) {
+// 	cur_frm.set_query('unidad_medica', function () {
+// 		return {
+// 			filters: [
+// 				["Unidad Medica", "activo", "=", 1],
+// 				["Unidad Medica", "empresa", "=", empresa],
+// 				["Unidad Medica", "cliente", "=", cliente]
+// 			]
+// 		};
+// 	});
+
 
 
 function estableceContextoListView(listview, docTypeName, nivel) {
@@ -188,7 +514,7 @@ function estableceContextoListView(listview, docTypeName, nivel) {
 	
 	if(docTypeName == null)
 	{
-		docTypeName = currentDocTypeName;
+		docTypeName = currentDocTypeNameLst;
 	}
 
 	if(nivel == null)
@@ -196,49 +522,53 @@ function estableceContextoListView(listview, docTypeName, nivel) {
 		nivel = currentNivel;
 	}
 
-    var contexto = getContexto();
+	var contexto = null;
+		
+	getContexto().then(function(resp){ 
+		contexto = resp;
    
-    if (contexto == null) {
-        cargaDatosSesion(nivel, estableceContextoListView);
-    }
-    else {
-        listview.page.add_inner_message(contexto.GetString());
+		if (contexto == null || !(contexto.EsValido(nivel))) {
+			cargaDatosSesion(nivel, estableceContextoListView);
+		}
+		else {
+			listview.page.add_inner_message(contexto.GetString());
 
-        var opcionesCliente = {
-            "empresa": getUnformatedOptions(contexto.Empresa),
-        };
+			var opcionesCliente = {
+				"empresa": obtieneIdentificador(contexto.Empresa),
+			};
 
-        if(nivel!=="EMPRESA")
-        {
-            if(nivel=="CLIENTE")
-            {
-                if(!(contexto.Cliente==null))
-                {
-                    opcionesCliente.cliente = getUnformatedOptions(contexto.Cliente);
-                }        
-            }
-            else
-            {
-                if(nivel=="UNIDAD_MEDICA")
-                {
-                    if(!(contexto.UnidadMedica==null))
-                    {
-                        opcionesCliente.area = contexto.Area;
-                        opcionesCliente.unidad_medica = getUnformatedOptions(contexto.UnidadMedica);
-                    }        
-                }
-            }
-        }
+			if(nivel!=="EMPRESA")
+			{
+				opcionesCliente.area = contexto.Area;
 
-        console.log(opcionesCliente);
+				if(nivel=="CLIENTE")
+				{
+					if(IsNotEmpty(contexto.Cliente))
+					{
+						opcionesCliente.cliente = obtieneIdentificador(contexto.Cliente);
+					}
+				}
+				else
+				{
+					if(nivel=="UNIDAD_MEDICA")
+					{
+						if(IsNotEmpty(contexto.UnidadMedica))
+						{
+							opcionesCliente.unidad_medica = obtieneIdentificador(contexto.UnidadMedica);
+						}
+					}
+				}
+			}
 
-        frappe.route_options = opcionesCliente;
+			console.log(opcionesCliente);
 
-        frappe.set_route("List", docTypeName);
+			frappe.route_options = opcionesCliente;
 
-        console.log(frappe.route_options);
-        listview.refresh();
-    }
+			frappe.set_route("List", docTypeName);
+
+			listview.refresh();
+		}
+	});
 }
 
 async function cargaDatosSesion(nivel, callback)
@@ -256,39 +586,48 @@ async function cargaDatosSesion(nivel, callback)
             }
             else
             {
-                var primerEmpresa = empresas[0];
+				var primerEmpresa = empresas[0];
+				
+				if(nivel === "AREA")
+				{
+					return CargaDialogoArea(lstEmpresas, callback);
+				}
+				else
+				{
+					CargaClientes(primerEmpresa.name).then(function(resp){
+						clientes = resp.message;
+						
+						if(!(clientes==null))
+						{
+							var lstClientes = getFormatedOptions(clientes, strCampoCliente);
 
-                CargaClientes(primerEmpresa.name).then(function(resp){
-                    clientes = resp.message;
-                    
-                    if(!(clientes==null))
-                    {
-                        var lstClientes = getFormatedOptions(clientes, strCampoCliente);
+							if(nivel === "CLIENTE")
+							{
+								return CargaDialogoCliente(lstEmpresas, lstClientes, callback);            
+							}
+							else
+							{
+								var primerCliente = clientes[0];
 
-                        if(nivel === "CLIENTE")
-                        {
-                            return CargaDialogoClientes(lstEmpresas, lstClientes, callback);            
-                        }
-                        else
-                        {
-                            var primerCliente = clientes[0];
+								CargaUnidades(primerCliente.name).then(function(resp){
+									unidades = resp.message;
 
-                            CargaUnidades(primerCliente.name).then(function(resp){
-                                unidades = resp.message;
+									var lstUnidades = getFormatedOptions(unidades, 'nombre');
 
-                                var lstUnidades = getFormatedOptions(unidades, 'nombre');
-
-                                return CargaDialogo(lstEmpresas, lstClientes, lstUnidades, estableceContexto);
-                            });
-                        }
-                    }
-                });
+									return CargaDialogoUnidadMedica(lstEmpresas, lstClientes, lstUnidades, callback);
+								});
+							}
+						}
+					});
+				}
             }
         }
 	});		
 }
 
-function CargaDialogo(lstEmpresas, lstClientes, lstUnidades, callback) {
+function CargaDialogoUnidadMedica(lstEmpresas, lstClientes, lstUnidades, callback) {
+	var indiceCliente = 2;
+	var indiceUnidadMedica = 3;
 
 	dialogo = new frappe.ui.Dialog({
 		title: 'Seleccione los parámetros de trabajo para la pagina actual',
@@ -306,39 +645,17 @@ function CargaDialogo(lstEmpresas, lstClientes, lstUnidades, callback) {
 						
 						if(!(clientes==null))
 						{
-							var lstClientes = getFormatedOptions(clientes, 'abreviacion');
+							var lstClientes = getFormatedOptions(clientes, strCampoCliente);
 
-							dialogo.fields_list[1].df.options = lstClientes;
+							dialogo.fields_list[indiceCliente].df.options = lstClientes;
 
-							dialogo.fields_list[1].set_formatted_input();
+							dialogo.fields_list[indiceCliente].set_formatted_input();
 						}
 					});					
 				}
 			},
 			{
-				label: 'Cliente',
-				fieldname: 'cliente',
-				fieldtype: 'Select',
-				options: lstClientes,
-				reqd: 1,
-				onchange: function(e) {
-
-					CargaUnidades(this.value).then(function(resp){						
-						unidades = resp.message;				
-						
-						if(!(unidades==null))
-						{
-							var lstUnidades = getFormatedOptions(unidades, 'nombre');
-
-							dialogo.fields_list[3].df.options = lstUnidades;
-
-							dialogo.fields_list[3].set_formatted_input();
-						}
-					});					
-				}
-			},
-			{
-				label: 'Area',
+				label: 'Área',
 				fieldname: 'area',
 				fieldtype: 'Select',
 				reqd: 1,
@@ -348,34 +665,37 @@ function CargaDialogo(lstEmpresas, lstClientes, lstUnidades, callback) {
 				]
 			},
 			{
+				label: 'Cliente',
+				fieldname: 'cliente',
+				fieldtype: 'Select',
+				options: lstClientes,
+				reqd: 1,
+				onchange: function(e) {
+					CargaUnidades(this.value).then(function(resp){						
+						unidades = resp.message;				
+						
+						if(!(unidades==null))
+						{
+							var lstUnidades = getFormatedOptions(unidades, strCampoUnidadMedica);
+
+							dialogo.fields_list[indiceUnidadMedica].df.options = lstUnidades;
+
+							dialogo.fields_list[indiceUnidadMedica].set_formatted_input();
+						}
+					});					
+				}
+			},
+			{
 				label: 'Unidad Médica',
 				fieldname: 'unidadMedica',
 				fieldtype: 'Select',
 				options: lstUnidades,
-				reqd: 1
+				reqd: 0,
 			}
 		],
 		primary_action_label: 'Aceptar',
 		primary_action(values) {
-			var empresa = values.empresa;
-			var cliente =  values.cliente;
-			var area =  values.area;
-			var unidadMedica = values.unidadMedica;
-			
-			var contexto = new Contexto(empresa, area, cliente, unidadMedica);
-
-			if(setContexto(contexto))
-			{
-				if(frappe.db.exists("Relacion Usuario", frappe.session.user))
-				{
-					guardaRelacion(contexto, frappe.session.user);
-							
-					if(!(callback==null))
-					{
-						callback();
-					}						
-				}
-			}
+			estableceContexto(values.empresa, values.area, values.cliente, values.unidadMedica, callback);
 
 			dialogo.hide();
 		}
@@ -384,7 +704,8 @@ function CargaDialogo(lstEmpresas, lstClientes, lstUnidades, callback) {
 	dialogo.show();
 }
 
-function CargaDialogoClientes(lstEmpresas, lstClientes, callback) {
+function CargaDialogoCliente(lstEmpresas, lstClientes, callback) {
+	var indiceCliente = 2;
 
 	dialogo = new frappe.ui.Dialog({
 		title: 'Seleccione los parámetros de trabajo para la pagina actual',
@@ -403,12 +724,22 @@ function CargaDialogoClientes(lstEmpresas, lstClientes, callback) {
 						{
 							var lstClientes = getFormatedOptions(clientes, strCampoCliente);
 
-							dialogo.fields_list[1].df.options = lstClientes;
+							dialogo.fields_list[indiceCliente].df.options = lstClientes;
 
-							dialogo.fields_list[1].set_formatted_input();
+							dialogo.fields_list[indiceCliente].set_formatted_input();
 						}
 					});					
 				}
+			},
+			{
+				label: 'Área',
+				fieldname: 'area',
+				fieldtype: 'Select',
+				reqd: 1,
+				options: [
+					'SIA',
+					'SIO'
+				]
 			},
 			{
 				label: 'Cliente',
@@ -416,16 +747,11 @@ function CargaDialogoClientes(lstEmpresas, lstClientes, callback) {
 				fieldtype: 'Select',
 				options: lstClientes,
 				reqd: 1,
-				// onchange: function(e) {	
-				// }
 			}
 		],
 		primary_action_label: 'Aceptar',
 		primary_action(values) {
-			var empresa = values.empresa;
-			var cliente =  values.cliente;
-
-			estableceContexto(empresa, cliente, null, null, callback);			
+			estableceContexto(values.empresa, values.area, values.cliente, null, callback);
 
 			dialogo.hide();
 		}
@@ -434,6 +760,39 @@ function CargaDialogoClientes(lstEmpresas, lstClientes, callback) {
 	dialogo.show();
 }
 
+function CargaDialogoArea(lstEmpresas, callback) {
+
+	dialogo = new frappe.ui.Dialog({
+		title: 'Seleccione los parámetros de trabajo para la pagina actual',
+		fields: [
+			{
+				label: 'Empresa',
+				fieldname: 'empresa',
+				fieldtype: 'Select',
+				options: lstEmpresas,
+				reqd: 1,
+			},
+			{
+				label: 'Área',
+				fieldname: 'area',
+				fieldtype: 'Select',
+				reqd: 1,
+				options: [
+					'SIA',
+					'SIO'
+				]
+			},
+		],
+		primary_action_label: 'Aceptar',
+		primary_action(values) {
+			estableceContexto(values.empresa, values.area, null, null, callback);
+
+			dialogo.hide();
+		}
+	});	
+
+	dialogo.show();
+}
 
 function CargaDialogoEmpresa(lstEmpresas, callback) {
 
@@ -446,15 +805,11 @@ function CargaDialogoEmpresa(lstEmpresas, callback) {
 				fieldtype: 'Select',
 				options: lstEmpresas,
 				reqd: 1,
-				// onchange: function(e) {
-				// }
 			}
 		],
 		primary_action_label: 'Aceptar',
 		primary_action(values) {
-			var empresa = values.empresa;
-			
-			estableceContexto(empresa, null, null, null, callback);
+			estableceContexto(values.empresa, null, null, null, callback);
 
 			dialogo.hide();
 		}
@@ -464,8 +819,40 @@ function CargaDialogoEmpresa(lstEmpresas, callback) {
 }
 
 
-function estableceContexto(empresa, area, cliente, unidadMedica, callback) {
-	var contexto = new Contexto(empresa, area, cliente, unidadMedica);
+function IsNotEmpty(valor)
+{
+	return (!(valor==null) && valor!=='')
+}
+
+
+function estableceContexto(datosEmpresa, datosArea, datosCliente, datosUnidadMedica, callback) {
+	
+	var contexto = new Contexto('', '', '', '');
+
+	if(IsNotEmpty(datosEmpresa))
+	{
+		contexto.Empresa = obtieneIdentificador(datosEmpresa);
+		contexto.EtiquetaEmpresa = obtieneEtiqueta(datosEmpresa);
+	}
+
+	if(IsNotEmpty(datosArea))
+	{
+		contexto.Area = obtieneIdentificador(datosArea);
+		contexto.EtiquetaArea = obtieneEtiqueta(datosArea);
+	}
+
+	if(IsNotEmpty(datosCliente))
+	{
+		contexto.Cliente = obtieneIdentificador(datosCliente);
+		contexto.EtiquetaCliente = obtieneEtiqueta(datosCliente);
+	}
+	
+	if(IsNotEmpty(datosUnidadMedica))
+	{
+		contexto.UnidadMedica = obtieneIdentificador(datosUnidadMedica);
+		contexto.EtiquetaUnidadMedica = obtieneEtiqueta(datosUnidadMedica);
+	}
+
 	if (setContexto(contexto)) {
 		if (frappe.db.exists("Relacion Usuario", frappe.session.user)) {
 			guardaRelacion(contexto, frappe.session.user);
@@ -482,10 +869,10 @@ function guardaRelacion(contexto, user)
 	{
 		try
 		{
-			frappe.db.set_value("Relacion Usuario", user, "empresa", getUnformatedOptions(contexto.Empresa));	
+			frappe.db.set_value("Relacion Usuario", user, "empresa", contexto.Empresa);	
 			frappe.db.set_value("Relacion Usuario", user, "area", contexto.Area);
-			frappe.db.set_value("Relacion Usuario", user, "cliente", getUnformatedOptions(contexto.Cliente));
-			frappe.db.set_value("Relacion Usuario", user, "unidad_medica", getUnformatedOptions(contexto.UnidadMedica));
+			frappe.db.set_value("Relacion Usuario", user, "cliente", contexto.Cliente);
+			frappe.db.set_value("Relacion Usuario", user, "unidad_medica", contexto.UnidadMedica);
 		}catch(err)
 		{
 			console.log(err);
@@ -493,7 +880,7 @@ function guardaRelacion(contexto, user)
 	}
 }
 
-async function CargaRelacionUsuario(){
+async function cargaRelacionUsuario(){
 	return await frappe.call({
 		method:'frappe.client.get',
 		args: {
@@ -514,14 +901,28 @@ function getFormatedOptions(listaObjetos, campoDescripcion)
 	return lstOpciones;
 }
 
-function getUnformatedOptions(campoDescripcion)
+function obtieneIdentificador(campoDescripcion)
 {
-	if(!(campoDescripcion == null))
+	if(IsNotEmpty(campoDescripcion))
 	{
 		var indice = campoDescripcion.indexOf("-", 0);
 
 		if (indice > 0) {
 			return (campoDescripcion.substring(0, indice - 1)).trim();
+		}
+	}
+
+	return campoDescripcion;
+}
+
+function obtieneEtiqueta(campoDescripcion)
+{
+	if(IsNotEmpty(campoDescripcion))
+	{
+		var indice = campoDescripcion.indexOf("-", 0);
+
+		if (indice > 0) {
+			return (campoDescripcion.substring(indice + 1)).trim();
 		}
 	}
 

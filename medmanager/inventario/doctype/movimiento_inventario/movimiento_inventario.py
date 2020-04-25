@@ -172,8 +172,8 @@ def productos_almacen(doctype, txt, searchfield, start, page_len, filters):
 				" `tabProducto Inventario` as i on "
 				" p.name = i.producto "
 				" where i.parent = %s "
-				" and i.parentfield = ""inventario"""
-				" and i.movimiento_inventario is null or i.movimiento_inventario = '' "
+				" and i.parentfield = 'inventario' "
+				" and i.`movimiento_inventario` is null or i.`movimiento_inventario` = '' "
 				" order by p.name asc", almacen)
 		else:
 			frappe.throw("El Almacén: {0} no existe".format(almacen))

@@ -1,0 +1,23 @@
+{
+ "align_labels_right": 0, 
+ "creation": "2020-04-25 16:52:38.603482", 
+ "custom_format": 0, 
+ "default_print_language": "es-MX", 
+ "disabled": 0, 
+ "doc_type": "Surtido Procedimiento", 
+ "docstatus": 0, 
+ "doctype": "Print Format", 
+ "font": "Default", 
+ "format_data": "[{\"fieldname\": \"print_heading_template\", \"fieldtype\": \"Custom HTML\", \"options\": \"<div class=\\\"print-heading\\\">\\n<div style=\\\"float: left;\\\">\\n<img src=\\\"{{ doc.logo }}\\\" style=\\\"width: 100px; heigth: 100px;\\\" />\\n</div>\\n<div style=\\\"float: right;\\\">\\n<h2>Surtido de Procedimiento<br>\\n<small>{{ doc.name }}</small>\\n</h2></div>\\n<div style=\\\"clear:both;\\\">\\n</div>\\n</div>\"}, {\"fieldtype\": \"Section Break\", \"label\": \"\"}, {\"fieldtype\": \"Column Break\"}, {\"print_hide\": 0, \"fieldname\": \"empresa\", \"label\": \"Empresa\"}, {\"print_hide\": 0, \"fieldname\": \"solicitud\", \"label\": \"Solicitud de Procedimiento\"}, {\"print_hide\": 0, \"fieldname\": \"unidad_medica\", \"label\": \"Unidad m\\u00e9dica\"}, {\"print_hide\": 0, \"fieldname\": \"fecha_cirugia\", \"label\": \"Fecha de cirug\\u00eda\"}, {\"print_hide\": 0, \"fieldname\": \"tipo_procedimiento\", \"label\": \"Tipo de procedimiento\"}, {\"print_hide\": 0, \"fieldname\": \"nombre_paciente\", \"label\": \"Paciente\"}, {\"print_hide\": 0, \"fieldname\": \"medico\", \"label\": \"Cirujano\"}, {\"print_hide\": 0, \"fieldname\": \"area\", \"label\": \"Zona\"}, {\"print_hide\": 0, \"fieldname\": \"almacen_origen\", \"label\": \"Almac\\u00e9n Origen\"}, {\"print_hide\": 0, \"fieldname\": \"almacen_destino\", \"label\": \"Almac\\u00e9n Destino\"}, {\"print_hide\": 0, \"fieldname\": \"tipo\", \"label\": \"Tipo de movimiento\"}, {\"print_hide\": 0, \"fieldname\": \"fecha_salida\", \"label\": \"Fecha de salida\"}, {\"print_hide\": 0, \"fieldname\": \"fecha_recepcion\", \"label\": \"Fecha de recepci\\u00f3n\"}, {\"visible_columns\": [{\"print_hide\": 0, \"fieldname\": \"producto\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"lote\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"cantidad_maxima\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"cantidad\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"unidad\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"fecha_caducidad\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"producto_inventario\", \"print_width\": \"\"}], \"print_hide\": 0, \"fieldname\": \"movimientos\", \"label\": \"Movimientos\"}, {\"print_hide\": 0, \"fieldname\": \"estatus\", \"label\": \"Estatus\"}]", 
+ "idx": 0, 
+ "line_breaks": 0, 
+ "modified": "2020-04-25 16:54:38.829423", 
+ "modified_by": "Administrator", 
+ "module": "Inventario", 
+ "name": "Surtido de Procedimiento", 
+ "owner": "Administrator", 
+ "print_format_builder": 0, 
+ "print_format_type": "Server", 
+ "show_section_headings": 0, 
+ "standard": "Yes"
+}

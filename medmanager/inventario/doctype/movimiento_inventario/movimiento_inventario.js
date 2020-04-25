@@ -10,7 +10,12 @@ frappe.ui.form.on('Movimiento Inventario', {
 		}
 	},
 	onload: function(frm) {
-		SetWorkingData();
+		currentNivel = 'AREA';
+		currentDocTypeNameFrm = 'Movimiento Inventario';
+
+		estableceContextoForm(frm, currentDocTypeNameFrm, currentNivel);
+
+		frm.page.add_inner_button('Cambiar', () =>  cambiaRelacionUsuarioForm(frm, currentDocTypeNameFrm, currentNivel));
 
 		if(frm.doc.docstatus == 0)
 		{
@@ -152,6 +157,7 @@ frappe.ui.form.on('Producto Mvto Inventario', {
 });
 
 function EstableceFiltroOrigen(frm, cur_frm) {
+
 	cur_frm.set_query('almacen_origen', function () {
 		return {
 			filters: [

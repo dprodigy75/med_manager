@@ -1,43 +1,62 @@
 // Copyright (c) 2020, Brandmand and contributors
-// For license information, please see license.txt
+currentNivel = 'EMPRESA';
+currentDocTypeNameFrm = 'Contrato SIO';
 
 frappe.ui.form.on('Contrato SIO', {
-	refresh: function(frm) {
-		// var partidas = frm.doc.partidas;
-
-		// if(!(partidas==null))
-		// {
-		// 	var found = partidas.find(function(element) { 
-		// 		return element.servicio != null;
-		// 	});
-
-		// 	if(!(found==null))
-		// 	{				
-		// 		var opciones = [];
-
-		// 		$.each(partidas, function( index, element ) {
-		// 			opciones.push(element.servicio);						
-		// 		});
-
-		// 		var partida_new = frappe.meta.get_docfield(frm.doctype, "partida_new", cur_frm.doc.name);
-
-		// 		partida_new.options = opciones;						
-		// 	}
-		// }
-		cargaPartidasNew(frm);
-	},
 	onload: function(frm) {
-		 if(frm.doc.docstatus == 0 && frm.doc.__unsaved == 1)
-		 {
+		currentNivel = 'EMPRESA';
+		currentDocTypeNameFrm = 'Contrato SIO';
+
+		estableceContextoForm(frm, currentDocTypeNameFrm, currentNivel);
+
+		frm.page.add_inner_button('Cambiar', () =>  cambiaRelacionUsuarioForm(frm, currentDocTypeNameFrm, currentNivel));
+
+		if(frm.doc.docstatus == 0 && frm.doc.__unsaved == 1)
+		{
 		 	cur_frm.clear_table("partidas");
 		 	cur_frm.clear_table("subpartidas");
-		 }
-		 else
-		 {
+		}
+		else
+		{
 			cargaPartidasNew(frm);
 			clearNew(frm);
-		 }
+		}
 
+		cur_frm.set_query("servicio", "partidas", function (doc, cdt, cdn) {
+			return {
+				filters: [
+					["Catalogo de Servicios", "activo", "=", 1],
+					["Catalogo de Servicios", "empresa", "=", frm.doc.empresa],
+					["Catalogo de Servicios", "area", "=", "SIO"]
+				]
+			};
+
+		});
+	},
+	refresh: function(frm) {
+		var contexto = null;
+		
+		getContexto().then(function(resp){ 
+			contexto = resp;
+
+			frm.page.add_inner_message(contexto.GetString());
+
+			frm.page.add_inner_button('Cambiar', () =>  cambiaRelacionUsuarioForm(frm, currentDocTypeNameFrm, currentNivel));
+			//frm.page.add_inner_button('Cambiar', () =>  cambiaRelacionUsuarioForm(frm, currentDocTypeNameFrm, currentNivel));
+		});
+
+		cargaPartidasNew(frm);
+
+		cur_frm.set_query("servicio", "partidas", function (doc, cdt, cdn) {
+			return {
+				filters: [
+					["Catalogo de Servicios", "activo", "=", 1],
+					["Catalogo de Servicios", "empresa", "=", frm.doc.empresa],
+					["Catalogo de Servicios", "area", "=", "SIO"]
+				]
+			};
+
+		});
 	},
 	boton_new: function(frm) {
 		

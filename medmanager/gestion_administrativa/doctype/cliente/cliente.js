@@ -1,9 +1,25 @@
 // Copyright (c) 2020, Brandmand and contributors
-// For license information, please see license.txt
+currentNivel = 'EMPRESA';
+currentDocTypeNameFrm = 'Cliente';
 
 frappe.ui.form.on('Cliente', {
-	refresh: function(frm) {
+	onload: function(frm) {
+		currentNivel = 'EMPRESA';
+		currentDocTypeNameFrm = 'Cliente';
 
+		estableceContextoForm(frm, currentDocTypeNameFrm, currentNivel);
+
+		frm.page.add_inner_button('Cambiar', () =>  cambiaRelacionUsuarioForm(frm, currentDocTypeNameFrm, currentNivel));
+	},
+	refresh: function(frm) {
+		var contexto = null;
+		
+		getContexto().then(function(resp){ 
+			contexto = resp;
+
+			frm.page.add_inner_message(contexto.GetString());
+			frm.page.add_inner_button('Cambiar', () =>  cambiaRelacionUsuarioForm(frm, currentDocTypeNameFrm, currentNivel));
+		});
 	},
 	rfc: function(frm) {
 		// var rfcValido = ValidaRFC(frm.doc.rfc);
@@ -25,6 +41,11 @@ frappe.ui.form.on('Cliente', {
 		validaRFC(frm);
 	}
 });
+
+function EstableceFiltrosSesion()
+{
+
+}
 
 function validaRFC(frm)
 {

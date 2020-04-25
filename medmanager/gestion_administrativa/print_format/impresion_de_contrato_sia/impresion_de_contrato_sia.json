@@ -1,0 +1,23 @@
+{
+ "align_labels_right": 1, 
+ "creation": "2020-04-25 11:17:32.443197", 
+ "custom_format": 0, 
+ "default_print_language": "es-MX", 
+ "disabled": 0, 
+ "doc_type": "Contrato SIA", 
+ "docstatus": 0, 
+ "doctype": "Print Format", 
+ "font": "Default", 
+ "format_data": "[{\"fieldname\": \"print_heading_template\", \"fieldtype\": \"Custom HTML\", \"options\": \"<div class=\\\"print-heading\\\">\\n<div style=\\\"float: left;\\\">\\n<img src=\\\"{{ doc.logo }}\\\" style=\\\"width: 100px; heigth: 100px;\\\" />\\n</div>\\n<div style=\\\"float: right;\\\">\\n<h2>Contrato<br>\\n<small>{{ doc.name }}</small>\\n</h2></div>\\n<div style=\\\"clear:both;\\\">\\n</div>\\n</div>\"}, {\"fieldtype\": \"Section Break\", \"label\": \"\"}, {\"fieldtype\": \"Column Break\"}, {\"print_hide\": 0, \"fieldname\": \"empresa\", \"label\": \"Empresa\"}, {\"print_hide\": 0, \"fieldname\": \"cliente\", \"label\": \"Cliente\"}, {\"print_hide\": 0, \"fieldname\": \"num_contrato\", \"label\": \"N\\u00famero de contrato\"}, {\"print_hide\": 0, \"fieldname\": \"num_licitacion\", \"label\": \"N\\u00famero de licitaci\\u00f3n\"}, {\"print_hide\": 0, \"fieldname\": \"fecha_inicio\", \"label\": \"Fecha de inicio\"}, {\"fieldtype\": \"Column Break\"}, {\"print_hide\": 0, \"options\": \"<div class=\\\"row  data-field\\\" data-fieldname=\\\"nombre_empresa\\\" data-fieldtype=\\\"Data\\\">\\n <div class=\\\"col-xs-7 value\\\">\\n  {{doc.nombre_empresa}}\\t\\n </div>\\n</div>\", \"fieldname\": \"_custom_html\", \"fieldtype\": \"HTML\", \"label\": \"HTML Personalizado\"}, {\"print_hide\": 0, \"options\": \"<div class=\\\"row  data-field\\\" data-fieldname=\\\"nombre_empresa\\\" data-fieldtype=\\\"Data\\\">\\n <div class=\\\"col-xs-7 value\\\">\\n  {{doc.nombre_cliente}}\\t\\n </div>\\n</div>\", \"fieldname\": \"_custom_html\", \"fieldtype\": \"HTML\", \"label\": \"HTML Personalizado\"}, {\"print_hide\": 0, \"fieldname\": \"serie\", \"label\": \"Serie para facturac\\u00f3n\"}, {\"print_hide\": 0, \"fieldname\": \"nombre_licitacion\", \"label\": \"Nombre de la licitaci\\u00f3n\"}, {\"print_hide\": 0, \"fieldname\": \"fecha_fin\", \"label\": \"Fecha de fin\"}, {\"fieldtype\": \"Section Break\", \"label\": \"\"}, {\"fieldtype\": \"Column Break\"}, {\"fieldtype\": \"Section Break\", \"label\": \"Listado de partidas\"}, {\"fieldtype\": \"Column Break\"}, {\"visible_columns\": [{\"print_hide\": 0, \"fieldname\": \"num_partida\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"servicio\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"precio\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"precio_iva\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"num_procedimientos\", \"print_width\": \"\"}], \"print_hide\": 0, \"fieldname\": \"partidas\", \"label\": \"Servicios\"}, {\"fieldtype\": \"Section Break\", \"label\": \"Listado de subpartidas\"}, {\"fieldtype\": \"Column Break\"}, {\"visible_columns\": [{\"print_hide\": 0, \"fieldname\": \"num_partida\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"num_subpartida\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"clave\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"producto\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"unidad_medida\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"precio_venta\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"marca\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"modelo\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"pais\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"minimo\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"maximo\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"importe_minimo\", \"print_width\": \"\"}, {\"print_hide\": 0, \"fieldname\": \"importe_m\\u00e1ximo\", \"print_width\": \"\"}], \"print_hide\": 0, \"fieldname\": \"subpartidas\", \"label\": \"Subpartidas\"}]", 
+ "idx": 0, 
+ "line_breaks": 1, 
+ "modified": "2020-04-25 17:04:35.574317", 
+ "modified_by": "Administrator", 
+ "module": "Gestion Administrativa", 
+ "name": "Impresion de Contrato SIA", 
+ "owner": "Administrator", 
+ "print_format_builder": 1, 
+ "print_format_type": "Server", 
+ "show_section_headings": 1, 
+ "standard": "Yes"
+}

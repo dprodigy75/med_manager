@@ -1,23 +1,26 @@
 // Copyright (c) 2020, Brandmand and contributors
 // For license information, please see license.txt
+currentNivel = 'EMPRESA';
+currentDocTypeNameFrm = 'Contrato';
 
 frappe.ui.form.on('Contrato', {
+	onload: function(frm) {
+		currentNivel = 'EMPRESA';
+		currentDocTypeNameFrm = 'Contrato';
+
+		estableceContextoForm(frm, currentDocTypeNameFrm, currentNivel);
+
+		frm.page.add_inner_button('Cambiar', () =>  cambiaRelacionUsuarioForm(frm, currentDocTypeNameFrm, currentNivel));
+	},
 	refresh: function(frm) {
-		console.log(frm.doc.name);
-		// frappe.call({
-		// 	'method': 'frappe.client.get_list',
-		// 	'args': {
-		// 	  'doctype': 'Periodo Contrato',
-		// 	  fields: ['name', 'contrato'],
-		// 	  filters: {"contrato": ["=", frm.doc.name]},
-		// 	},
-		// 	'callback': function(res){
-		// 		console.log(res);
-		// 		var template = "<table><tbody>{% for (var row in rows) { %}<tr>{% for (var col in rows[row]) { %}<td>rows[row][col]</td>{% } %}</tr>{% } %}</tbody></table>";
-		// 	   frm.set_df_property('html_fieldname', 'options', frappe.render(template, {rows: res.message}));
-		// 	   frm.refresh_field('html_fieldname');
-		// 	}
-		//   });
+		var contexto = null;
+		
+		getContexto().then(function(resp){ 
+			contexto = resp;
+
+			frm.page.add_inner_message(contexto.GetString());
+			frm.page.add_inner_button('Cambiar', () =>  cambiaRelacionUsuarioForm(frm, currentDocTypeNameFrm, currentNivel));
+		});
 	},
 	cliente: function(frm) {
 		if(!(frm.doc.cliente == null))

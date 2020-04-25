@@ -23,25 +23,21 @@ frappe.ui.form.on('Relacion Usuario', {
 		EstableceFiltroUnidadMedica(frm);
 	},
 	empresa: function(frm) {
-		console.log(frm.doc.empresa);
-
 		EstableceFiltroCliente(frm);
 	},
 	cliente: function(frm) {
-		console.log(frm.doc.cliente);
-
 		EstableceFiltroUnidadMedica(frm);
 	},
 });
 
 
 function EstableceFiltroUnidadMedica(frm) {
-	frm.set_value('unidad', null);
-	frm.refresh_field('unidad');
+	frm.set_value('unidad_medica', null);
+	frm.refresh_field('unidad_medica');
 
 	var valor = frm.doc.cliente ?? '';
 
-	cur_frm.set_query('unidad', function () {
+	cur_frm.set_query('unidad_medica', function () {
 		return {
 			filters: [
 				["Unidad Medica", "cliente", "=", valor],
@@ -75,7 +71,7 @@ function toggle_tipo_relacion(frm)
 		frm.toggle_display(['area'], false);
 		frm.toggle_display(['cliente'], false);
 		frm.toggle_display(['proveedor'], false);
-		frm.toggle_display(['unidad'], false);
+		frm.toggle_display(['unidad_medica'], false);
 		return;
 	}
 	if(frm.doc.tipo_relacion=="Administrador")
@@ -84,13 +80,13 @@ function toggle_tipo_relacion(frm)
 		frm.toggle_display(['area'], false);
 		frm.toggle_display(['cliente'], false);
 		frm.toggle_display(['proveedor'], false);
-		frm.toggle_display(['unidad'], false);
+		frm.toggle_display(['unidad_medica'], false);
 
 		frm.toggle_reqd('empresa', false);
 		frm.toggle_reqd('area', false);
 		frm.toggle_reqd('cliente', false);
 		frm.toggle_reqd('proveedor', false);
-		frm.toggle_reqd('unidad', false);
+		frm.toggle_reqd('unidad_medica', false);
 
 		return;
 	}
@@ -100,13 +96,13 @@ function toggle_tipo_relacion(frm)
 		frm.toggle_display(['area'], true);
 		frm.toggle_display(['cliente'], true);
 		frm.toggle_display(['proveedor'], false);
-		frm.toggle_display(['unidad'], true);
+		frm.toggle_display(['unidad_medica'], true);
 
 		frm.toggle_reqd('empresa', true);
 		frm.toggle_reqd('area', true);
 		frm.toggle_reqd('cliente', true);
 		frm.toggle_reqd('proveedor', false);
-		frm.toggle_reqd('unidad', false);
+		frm.toggle_reqd('unidad_medica', false);
 
 		return;
 	}
@@ -116,13 +112,13 @@ function toggle_tipo_relacion(frm)
 		frm.toggle_display(['area'], false);
 		frm.toggle_display(['cliente'], true);
 		frm.toggle_display(['proveedor'], false);
-		frm.toggle_display(['unidad'], false);
+		frm.toggle_display(['unidad_medica'], false);
 
 		frm.toggle_reqd('empresa', true);
 		frm.toggle_reqd('area', false);
 		frm.toggle_reqd('cliente', true);
 		frm.toggle_reqd('proveedor', false);
-		frm.toggle_reqd('unidad', false);
+		frm.toggle_reqd('unidad_medica', false);
 
 		return;
 	}
@@ -132,13 +128,13 @@ function toggle_tipo_relacion(frm)
 		frm.toggle_display(['area'], false);
 		frm.toggle_display(['cliente'], false);
 		frm.toggle_display(['proveedor'], true);
-		frm.toggle_display(['unidad'], false);
+		frm.toggle_display(['unidad_medica'], false);
 
 		frm.toggle_reqd('empresa', true);
 		frm.toggle_reqd('area', false);
 		frm.toggle_reqd('cliente', false);
 		frm.toggle_reqd('proveedor', true);
-		frm.toggle_reqd('unidad', false);
+		frm.toggle_reqd('unidad_medica', false);
 
 		return;
 	}

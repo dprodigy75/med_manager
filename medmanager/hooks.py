@@ -69,6 +69,10 @@ app_include_js = "/assets/medmanager/js/medmanager.js"
 
 permission_query_conditions = {
 	"Almacen": "medmanager.inventario.doctype.almacen.almacen.get_permission_query_conditions",
+	"Cliente": "medmanager.gestion_administrativa.doctype.cliente.cliente.get_permission_query_conditions",
+	"Contrato": "medmanager.gestion_administrativa.doctype.contrato.contrato.get_permission_query_conditions",
+	"Contrato SIO": "medmanager.gestion_administrativa.doctype.contrato_sio.contrato_sio.get_permission_query_conditions",
+	"Contrato SIA": "medmanager.gestion_administrativa.doctype.contrato_sia.contrato_sia.get_permission_query_conditions",
 }
 #
 # has_permission = {
